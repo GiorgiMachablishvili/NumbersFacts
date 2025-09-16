@@ -1,3 +1,4 @@
+
 import Foundation
 
 actor InMemoryFactRepository: NumberFactRepository {
@@ -10,4 +11,8 @@ actor InMemoryFactRepository: NumberFactRepository {
     }
 
     func recent(limit: Int) async -> [NumberFact] { Array(items.prefix(limit)) }
+    
+    func clear() async {
+        items.removeAll()
+    }
 }

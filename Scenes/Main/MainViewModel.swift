@@ -1,3 +1,4 @@
+
 import Foundation
 import SwiftUI
 
@@ -10,6 +11,7 @@ final class MainViewModel: ObservableObject {
     @Published private(set) var history: [NumberFact] = []
     @Published private(set) var isLoading = false
     @Published private(set) var errorMessage: String?
+    @Published private(set) var lastSearchNumber: Int?
 
     init(api: NumbersAPIClient, repo: NumberFactRepository = InMemoryFactRepository()) {
         self.api = api
@@ -17,34 +19,77 @@ final class MainViewModel: ObservableObject {
     }
 
     func onAppear() async {
-        history = await repo.recent(limit: 50)
+        await loadHistory()
     }
 
     func getRandomFact() async {
-        isLoading = true
-        errorMessage = nil
-        defer { isLoading = false }
-        do {
-            let fact = try await api.randomMathFact()
-            currentFact = fact
-            await repo.save(fact)
-            history = await repo.recent(limit: 50)
-        } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+        await performAPICall {
+            let fact = try await self.api.randomMathFact()
+            return fact
         }
     }
 
     func getFact(number: Int) async {
+        lastSearchNumber = number
+        await performAPICall {
+            let fact = try await self.api.fact(for: number)
+            return fact
+        }
+    }
+    
+    func clearError() {
+        errorMessage = nil
+    }
+    
+    func clearHistory() async {
+        await repo.clear()
+        history = []
+    }
+    
+    // MARK: - Private Methods
+    
+    private func performAPICall(_ apiCall: @escaping () async throws -> NumberFact) async {
+        guard !isLoading else { return }
+        
         isLoading = true
         errorMessage = nil
         defer { isLoading = false }
+        
         do {
-            let fact = try await api.fact(for: number)
+            let fact = try await apiCall()
             currentFact = fact
-            await repo.save(fact)
-            history = await repo.recent(limit: 50)
+            await saveFact(fact)
+            await loadHistory()
         } catch {
-            errorMessage = (error as? LocalizedError)?.errorDescription ?? error.localizedDescription
+            handleError(error)
+        }
+    }
+    
+    private func saveFact(_ fact: NumberFact) async {
+        do {
+            await repo.save(fact)
+        } catch {
+            print("Failed to save fact: \(error)")
+            // Don't show error to user for save failures, just log it
+        }
+    }
+    
+    private func loadHistory() async {
+        do {
+            history = await repo.recent(limit: AppConstants.Storage.historyLimit)
+        } catch {
+            print("Failed to load history: \(error)")
+            // Don't show error to user for history load failures
+        }
+    }
+    
+    private func handleError(_ error: Error) {
+        if let numbersError = error as? NumbersAPIError {
+            errorMessage = numbersError.errorDescription
+        } else if let localizedError = error as? LocalizedError {
+            errorMessage = localizedError.errorDescription ?? error.localizedDescription
+        } else {
+            errorMessage = "An unexpected error occurred. Please try again."
         }
     }
 }

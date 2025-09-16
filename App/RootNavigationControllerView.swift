@@ -1,11 +1,14 @@
+
 import SwiftUI
 
 struct RootNavigationControllerView: View {
+    @StateObject private var viewModel: MainViewModel
+    
+    init() {
+        self._viewModel = StateObject(wrappedValue: DependencyContainer.shared.makeMainViewModel())
+    }
+    
     var body: some View {
-        let api: NumbersAPIClient = NumbersAPIService()
-        let repo: NumberFactRepository = CoreDataFactRepository(context: PersistenceController.shared.viewContext)
-        let viewModel = MainViewModel(api: api, repo: repo)
-        
-        return MainView(viewModel: viewModel)
+        MainView(viewModel: viewModel)
     }
 }
