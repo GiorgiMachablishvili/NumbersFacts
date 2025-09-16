@@ -14,7 +14,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E30402552E793B0E00238F50 /* Scenes */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Scenes; sourceTree = "<group>"; };
 		E30402582E793B6700238F50 /* Data */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Data; sourceTree = "<group>"; };
-		E304025B2E793BEA00238F50 /* Domain */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Domain; sourceTree = "<group>"; };
 		E304037E2E793D3400238F50 /* App */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = App; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
@@ -33,7 +32,6 @@
 			isa = PBXGroup;
 			children = (
 				E304037E2E793D3400238F50 /* App */,
-				E304025B2E793BEA00238F50 /* Domain */,
 				E30402582E793B6700238F50 /* Data */,
 				E30402552E793B0E00238F50 /* Scenes */,
 				A1234567890ABCDEF123457E /* NumberFacts/Info.plist */,
@@ -67,7 +65,6 @@
 			fileSystemSynchronizedGroups = (
 				E30402552E793B0E00238F50 /* Scenes */,
 				E30402582E793B6700238F50 /* Data */,
-				E304025B2E793BEA00238F50 /* Domain */,
 				E304037E2E793D3400238F50 /* App */,
 			);
 			name = NumberFacts;
